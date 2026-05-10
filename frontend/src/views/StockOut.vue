@@ -115,7 +115,8 @@
 </template>
 
 <script>
-import { getStockOutRecords, stockOut, getAllFruits, getCustomers } from '@/api'
+import { getStockOutRecords, getAllFruits, getCustomers } from '@/api'
+import api from '@/api'
 
 export default {
   name: 'StockOut',
@@ -197,12 +198,20 @@ export default {
         if (!valid) return
         this.submitting = true
         try {
-          await stockOut(this.form)
+          await api.post('/stock/out', this.form, { skipErrorHandler: true })
           this.$message.success('出库成功')
           this.dialogVisible = false
           this.fetchRecords()
           this.fetchFruits()
-        } catch (e) {}
+        } catch (e) {
+          if (e.code === 1001) {
+            this.$message.error(`出库失败：${e.message}，请减少出库数量`)
+          } else if (e.code === 1002) {
+            this.$message.error(`出库失败：${e.message}，请重新选择水果`)
+          } else {
+            this.$message.error(`出库失败：${e.message || '未知错误'}`)
+          }
+        }
         this.submitting = false
       })
     },

@@ -3,6 +3,7 @@ package com.fruit.warehouse.service;
 import com.fruit.warehouse.dto.StockInRequest;
 import com.fruit.warehouse.dto.StockOutRequest;
 import com.fruit.warehouse.entity.*;
+import com.fruit.warehouse.exception.BusinessException;
 import com.fruit.warehouse.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class StockService {
         logger.info("入库操作: 水果ID={}, 数量={}", request.getFruitId(), request.getQuantity());
         
         Fruit fruit = fruitRepository.findById(request.getFruitId())
-                .orElseThrow(() -> new RuntimeException("水果不存在"));
+                .orElseThrow(() -> new BusinessException(1002, "水果不存在"));
         
         StockInRecord record = new StockInRecord();
         record.setRecordNo(generateRecordNo("IN"));
@@ -68,10 +69,10 @@ public class StockService {
         logger.info("出库操作: 水果ID={}, 数量={}", request.getFruitId(), request.getQuantity());
         
         Fruit fruit = fruitRepository.findById(request.getFruitId())
-                .orElseThrow(() -> new RuntimeException("水果不存在"));
+                .orElseThrow(() -> new BusinessException(1002, "水果不存在"));
         
-        if (fruit.getStockQuantity().compareTo(request.getQuantity()) <= 0) {
-            throw new RuntimeException("库存不足");
+        if (fruit.getStockQuantity().compareTo(request.getQuantity()) < 0) {
+            throw new BusinessException(1001, "库存不足");
         }
         
         StockOutRecord record = new StockOutRecord();

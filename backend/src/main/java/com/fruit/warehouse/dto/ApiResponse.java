@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class ApiResponse<T> {
     private int code;
+    private Integer errorCode;
     private String message;
     private T data;
 
@@ -27,6 +28,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> error(int code, String message) {
         ApiResponse<T> response = new ApiResponse<>();
         response.setCode(code);
+        response.setErrorCode(code);
         response.setMessage(message);
         return response;
     }
