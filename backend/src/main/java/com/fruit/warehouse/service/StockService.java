@@ -70,7 +70,7 @@ public class StockService {
         Fruit fruit = fruitRepository.findById(request.getFruitId())
                 .orElseThrow(() -> new RuntimeException("水果不存在"));
         
-        if (fruit.getStockQuantity().compareTo(request.getQuantity()) < 0) {
+        if (fruit.getStockQuantity().compareTo(request.getQuantity()) <= 0) {
             throw new RuntimeException("库存不足");
         }
         
