@@ -1,6 +1,7 @@
 package com.fruit.warehouse.config;
 
 import com.fruit.warehouse.dto.ApiResponse;
+import com.fruit.warehouse.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -56,6 +57,13 @@ public class GlobalExceptionHandler {
     public ApiResponse<Void> handleIllegalArgumentException(IllegalArgumentException e) {
         logger.warn("参数异常: {}", e.getMessage());
         return ApiResponse.error(400, e.getMessage());
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> handleBusinessException(BusinessException e) {
+        logger.warn("业务异常: {}", e.getMessage());
+        return ApiResponse.error(e.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
