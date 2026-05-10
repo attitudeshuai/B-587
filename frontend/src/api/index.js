@@ -13,18 +13,19 @@ api.interceptors.response.use(
   response => {
     const res = response.data
     if (res.code !== 200) {
-      Message.error(res.message || '请求失败')
-      return Promise.reject(new Error(res.message))
+      const err = new Error(res.message || '请求失败')
+      err.errorCode = res.errorCode || ''
+      err.businessError = true
+      return Promise.reject(err)
     }
     return res
   },
   error => {
-    // 优先从响应体中获取错误信息
     let errorMessage = '网络错误'
+    let errorCode = ''
     if (error.response) {
       const { data, status } = error.response
       if (data && data.message) {
-        // 后端返回的友好错误信息
         errorMessage = data.message
       } else if (status === 400) {
         errorMessage = '请求参数错误'
@@ -33,6 +34,9 @@ api.interceptors.response.use(
       } else if (status === 500) {
         errorMessage = '服务器内部错误，请稍后重试'
       }
+      if (data && data.errorCode) {
+        errorCode = data.errorCode
+      }
     } else if (error.message) {
       if (error.message.includes('timeout')) {
         errorMessage = '请求超时，请检查网络连接'
@@ -40,9 +44,13 @@ api.interceptors.response.use(
         errorMessage = '网络连接失败，请检查网络'
       }
     }
-    Message.error(errorMessage)
-    // 将友好的错误信息传递给调用方
+    if (errorCode) {
+      error.businessError = true
+    } else {
+      Message.error(errorMessage)
+    }
     error.friendlyMessage = errorMessage
+    error.errorCode = errorCode
     return Promise.reject(error)
   }
 )

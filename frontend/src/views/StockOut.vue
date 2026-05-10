@@ -202,7 +202,16 @@ export default {
           this.dialogVisible = false
           this.fetchRecords()
           this.fetchFruits()
-        } catch (e) {}
+        } catch (e) {
+          const errorCode = e.errorCode || ''
+          if (errorCode === 'INSUFFICIENT_STOCK') {
+            this.$message.warning('库存不足，请减少出库数量后重试')
+          } else if (errorCode === 'FRUIT_NOT_FOUND') {
+            this.$message.error('所选水果不存在，请重新选择')
+          } else if (e.businessError) {
+            this.$message.error(e.friendlyMessage || '出库失败')
+          }
+        }
         this.submitting = false
       })
     },

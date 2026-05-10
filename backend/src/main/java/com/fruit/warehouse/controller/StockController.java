@@ -23,22 +23,14 @@ public class StockController {
 
     @PostMapping("/in")
     public ApiResponse<StockInRecord> stockIn(@Valid @RequestBody StockInRequest request) {
-        try {
-            StockInRecord record = stockService.stockIn(request);
-            return ApiResponse.success("入库成功", record);
-        } catch (Exception e) {
-            return ApiResponse.error(e.getMessage());
-        }
+        StockInRecord record = stockService.stockIn(request);
+        return ApiResponse.success("入库成功", record);
     }
 
     @PostMapping("/out")
     public ApiResponse<StockOutRecord> stockOut(@Valid @RequestBody StockOutRequest request) {
-        try {
-            StockOutRecord record = stockService.stockOut(request);
-            return ApiResponse.success("出库成功", record);
-        } catch (Exception e) {
-            return ApiResponse.error(e.getMessage());
-        }
+        StockOutRecord record = stockService.stockOut(request);
+        return ApiResponse.success("出库成功", record);
     }
 
     @GetMapping("/in/records")
