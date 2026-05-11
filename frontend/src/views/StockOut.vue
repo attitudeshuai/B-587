@@ -202,7 +202,18 @@ export default {
           this.dialogVisible = false
           this.fetchRecords()
           this.fetchFruits()
-        } catch (e) {}
+        } catch (e) {
+          const errorCode = e.code || e.response?.data?.code || 0
+          let errorMsg = '出库失败，请重试'
+          if (errorCode === 4001) {
+            errorMsg = '库存不足，请减少出库数量后重试'
+          } else if (errorCode === 4004) {
+            errorMsg = '水果信息不存在，请刷新后重试'
+          } else if (e.friendlyMessage || e.message) {
+            errorMsg = e.friendlyMessage || e.message
+          }
+          this.$message.error(errorMsg)
+        }
         this.submitting = false
       })
     },
